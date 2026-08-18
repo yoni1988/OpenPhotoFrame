@@ -48,3 +48,4 @@ app.*.map.json
 # Android (CI) and Linux (development), so these are never part of a build.
 /ios/Podfile
 /macos/Podfile
+.env
