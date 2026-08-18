@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -532,6 +531,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String aboutSubtitle(String version) {
     return 'Open Photo Frame v$version';
   }
+
+  @override
+  String get configRecoveredFromBackup =>
+      'The config was corrupted. The backup was loaded. The app started with the last saved version.';
+
+  @override
+  String get configResetToDefaults =>
+      'The config was corrupted. No readable backup was found. The app started unconfigured.';
 
   @override
   String get noPhotosFound => 'No photos found';

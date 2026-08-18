@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('de'),
     Locale('en'),
+    Locale('zh'),
   ];
 
   /// No description provided for @settings.
@@ -1016,6 +1018,18 @@ abstract class AppLocalizations {
   /// **'Open Photo Frame v{version}'**
   String aboutSubtitle(String version);
 
+  /// No description provided for @configRecoveredFromBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'The config was corrupted. The backup was loaded. The app started with the last saved version.'**
+  String get configRecoveredFromBackup;
+
+  /// No description provided for @configResetToDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'The config was corrupted. No readable backup was found. The app started unconfigured.'**
+  String get configResetToDefaults;
+
   /// No description provided for @noPhotosFound.
   ///
   /// In en, this message translates to:
@@ -1076,7 +1090,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['de', 'en'].contains(locale.languageCode);
+      <String>['de', 'en', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1089,6 +1103,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

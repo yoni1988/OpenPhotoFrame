@@ -1,0 +1,266 @@
+{
+  "@@locale": "zh",
+  
+  "settings": "设置",
+  
+  "sectionSlideshow": "幻灯片",
+  "slideDuration": "显示时长",
+  "transitionDuration": "过渡时长",
+  "blurBorders": "模糊边框",
+  "blurBordersSubtitle": "将图片延展至全屏",
+  "unitMinutes": "分钟",
+  "unitSeconds": "秒",
+  "unitMilliseconds": "毫秒",
+  "transitionEffect": "切换效果",
+  "transitionEffectRandom": "随机",
+  "transitionEffectFade": "淡入淡出",
+  "transitionEffectSlideRight": "从右滑入",
+  "transitionEffectSlideLeft": "从左滑入",
+  "transitionEffectSlideUp": "向上滑入",
+  "transitionEffectSlideDown": "向下滑入",
+  "transitionEffectZoomIn": "放大进入",
+  "transitionEffectZoomOut": "缩小进入",
+  "transitionEffectRotate": "旋转",
+  "transitionEffectFlip": "3D 翻转",
+  "transitionEffectBlur": "模糊消散",
+  
+  "sectionClock": "时钟",
+  "showClock": "显示时钟",
+  "showClockSubtitle": "在幻灯片上显示时间",
+  "size": "大小",
+  "position": "位置",
+  
+  "sectionPhotoInfo": "照片信息",
+  "showPhotoInfo": "显示照片信息",
+  "showPhotoInfoSubtitle": "在幻灯片上显示日期和地点",
+  "useScriptFont": "使用手写字体",
+  "useScriptFontSubtitle": "以优雅的手写体显示元数据",
+  "resolveLocationNames": "解析地点名称",
+  "resolveLocationNamesSubtitle": "使用 OpenStreetMap 显示地名，而非经纬度坐标",
+  "nominatimHint": "使用 Nominatim（OpenStreetMap），无需 API 密钥。",
+  
+  "sectionPhotoSource": "照片来源",
+  "appFolder": "应用文件夹",
+  "appFolderSubtitle": "存放在应用文件夹中的照片",
+  "appFolderWarning": "请将照片复制到此文件夹。卸载应用时这些照片会被一并删除。",
+  "devicePhotos": "设备相册",
+  "devicePhotosSubtitle": "显示设备中的照片",
+  "localFolder": "本地文件夹",
+  "localFolderSubtitle": "使用本地文件夹中的照片",
+  "nextcloud": "Nextcloud",
+  "nextcloudSubtitle": "从 Nextcloud 公共分享链接同步",
+  "loading": "加载中…",
+  "loadingAlbums": "正在加载相册…",
+  "tapToLoadAlbums": "点击加载设备相册",
+  "load": "加载",
+  "photoAlbum": "相册",
+  "allPhotos": "全部照片",
+  "refreshAlbums": "刷新相册",
+  "change": "更改",
+  "reset": "重置",
+  "photoPermissionDenied": "照片权限被拒绝",
+  "errorLoadingAlbums": "加载相册出错：{error}",
+  "@errorLoadingAlbums": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPickFolder": "选择文件夹失败：{error}",
+  "@failedToPickFolder": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "selectPhotoFolder": "选择照片文件夹",
+  
+  "nextcloudPublicShareUrl": "Nextcloud 公共分享链接",
+  "nextcloudUrlHint": "https://cloud.example.com/s/abc123",
+  "webdavAuthPublicShare": "公共分享",
+  "webdavAuthLogin": "WebDAV 登录",
+  "webdavUrlLabel": "WebDAV 地址",
+  "webdavUrlHint": "https://cloud.example.com/remote.php/dav/files/user/",
+  "webdavUsername": "用户名",
+  "webdavPassword": "密码",
+  "webdavAllowInvalidCertificate": "接受无效证书",
+  "webdavAllowInvalidCertificateWarning": "不安全：仅适用于可信网络中的自签名证书。",
+  "testConnection": "测试连接",
+  "testing": "测试中…",
+  "connectionSuccessful": "连接成功！",
+  "syncAllNextcloudFolders": "全部文件夹",
+  "syncAllNextcloudFoldersSubtitle": "同步分享根目录及其所有子文件夹中的图片",
+  "syncSelectedNextcloudFolders": "指定文件夹",
+  "syncSelectedNextcloudFoldersSubtitle": "选择需要使用其直属图片的文件夹",
+  "loadNextcloudFolders": "加载文件夹",
+  "loadingNextcloudFolders": "正在加载文件夹…",
+  "nextcloudFolderSelectionHint": "请勾选分享根目录以及需要包含的子文件夹。",
+  "nextcloudShareRoot": "分享根目录",
+  "nextcloudShareRootSubtitle": "直接位于分享根目录中的图片",
+  "nextcloudFolderPhotoCount": "{count, plural, other{{count} 张照片}}",
+  "@nextcloudFolderPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nextcloudFoldersLoadError": "加载文件夹出错：{error}",
+  "@nextcloudFoldersLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "autoSyncInterval": "自动同步间隔",
+  "disabled": "已关闭",
+  "deleteOrphanedFiles": "删除多余文件",
+  "deleteOrphanedFilesSubtitle": "删除服务器上已不存在的本地文件",
+  "syncNow": "立即同步",
+  "syncing": "同步中…",
+  "syncCompletedSuccessfully": "同步完成！",
+  "syncCancelled": "同步已取消。",
+  "syncError": "错误：{error}",
+  "@syncError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "nextcloudErrorInvalidShareLink": "该 Nextcloud 分享链接已失效。",
+  "nextcloudErrorShareInaccessible": "该 Nextcloud 分享已无法访问。",
+  "nextcloudErrorConnectionTimeout": "连接 Nextcloud 超时。",
+  "nextcloudErrorConnectionFailed": "无法连接到 Nextcloud，请检查网络连接和分享链接。",
+  "nextcloudErrorDownloadStalled": "下载超时：15 分钟内未收到任何数据。",
+  "nextcloudErrorInvalidUrlEmpty": "地址为空。",
+  "nextcloudErrorInvalidUrlScheme": "地址协议无效，请使用 http 或 https。",
+  "nextcloudErrorInvalidUrlNoHost": "地址无效，缺少主机名。",
+  "nextcloudErrorInvalidUrlFormat": "地址格式无效：{error}",
+  "@nextcloudErrorInvalidUrlFormat": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "nextcloudErrorUnknown": "Nextcloud 同步失败：{error}",
+  "@nextcloudErrorUnknown": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "neverSynced": "从未同步",
+  "lastSyncJustNow": "上次同步：刚刚",
+  "lastSyncMinutesAgo": "上次同步：{minutes} 分钟前",
+  "@lastSyncMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lastSyncHoursAgo": "上次同步：{hours} 小时前",
+  "@lastSyncHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastSyncDate": "上次同步：{date}",
+  "@lastSyncDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "sectionDisplaySchedule": "定时开关屏",
+  "dayNightSchedule": "日夜时间表",
+  "dayNightScheduleSubtitle": "夜间自动关闭屏幕",
+  "dayStartsAt": "白天开始于",
+  "nightStartsAt": "夜间开始于",
+  "differentNightTimeOnFridaysAndSaturdays": "周五和周六使用不同的夜间时间",
+  "differentNightTimeFridaysAndSaturdays": "周五和周六夜间开始于",
+  "nativeScreenOff": "系统级熄屏",
+  "nativeScreenOffEnabledSubtitle": "使用设备管理器完全关闭屏幕",
+  "nativeScreenOffDisabledSubtitle": "需要设备管理器权限",
+  "deviceAdminExplanation": "完全关闭屏幕需要设备管理器权限。未授予时，屏幕只会调暗。",
+  "grantDeviceAdmin": "授予设备管理器权限",
+  "deviceAdminEnabled": "设备管理器已启用——屏幕将完全关闭",
+  "screenLockWarning": "重要：必须关闭屏幕锁（PIN／图案／密码），自动唤醒才能生效。请前往 设置 → 安全 → 屏幕锁定 → 无。",
+  
+  "deviceAdminActive": "设备管理器已激活",
+  "deviceAdminUninstallWarning": "要卸载本应用，需先在 Android 设置中停用设备管理器权限。",
+  "openDeviceAdminSettings": "打开设备管理器设置",
+  
+  "sectionAndroid": "Android",
+  "startOnBoot": "开机自启",
+  "startOnBootSubtitle": "设备启动时自动打开应用",
+  "keepAppRunning": "保持应用运行",
+  "keepAppRunningSubtitle": "防止应用在内存不足时被系统结束",
+  "notificationPermissionRequired": "「保持应用运行」需要通知权限",
+
+  "autoUpdateTitle": "自动更新",
+  "autoUpdateSubtitle": "检查 GitHub 上的新版本并安装",
+  "autoUpdateFdroidNote": "仅适用于从 GitHub 安装的版本。若通过 F-Droid 安装，请关闭此项并从 F-Droid 更新。",
+  "autoUpdateSilentTitle": "免确认安装",
+  "autoUpdateSilentSubtitle": "已检测到设备所有者权限：更新可在后台静默安装。",
+  "autoUpdatePromptNote": "有可用更新时，会先征求你的同意再安装。",
+  "autoUpdateCheckNow": "立即检查",
+  "autoUpdateUpToDate": "已是最新版本。",
+  "updateAvailableTitle": "有可用更新",
+  "updateAvailableMessage": "发现新版本 {version}，现在下载并安装吗？",
+  "@updateAvailableMessage": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateDownloading": "下载中…",
+  "updateSkip": "跳过",
+  "updateDownloadInstall": "下载并安装",
+  
+  "keepAliveDialogTitle": "保持应用运行",
+  "keepAliveWhatDoes": "这个功能有什么用？",
+  "keepAliveWhatDoesExplanation": "该功能让相框应用持续运行，即使设备内存不足也不会被中断。",
+  "keepAliveWhyNeed": "我为什么需要它？",
+  "keepAliveWhyNeedExplanation": "在内存较小的老旧设备上，Android 可能会结束应用以释放内存。开启后应用将以前台服务方式运行，从而避免被结束。",
+  "keepAliveWhatHappens": "开启后会发生什么？",
+  "keepAliveWhatHappensExplanation": "• 状态栏会出现一条常驻通知\n• 应用被 Android 结束的可能性大幅降低\n• 在 Android 13 及以上版本，需要授予通知权限",
+  "keepAliveDisableAnytime": "你随时可以在设置中关闭此功能。",
+  "cancel": "取消",
+  "enable": "开启",
+  
+  "about": "关于",
+  "aboutSubtitle": "Open Photo Frame v{version}",
+  "@aboutSubtitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "configRecoveredFromBackup": "配置文件已损坏，已读取备份。应用以最近一次保存的版本启动。",
+  "configResetToDefaults": "配置文件已损坏，且未找到可用备份。应用以未配置状态启动。",
+  
+  "noPhotosFound": "未找到照片",
+  "tapCenterToOpenSettings": "点击屏幕中央打开设置",
+  
+  "screenOrientation": "屏幕方向",
+  "screenOrientationAuto": "自动（重力感应）",
+  "screenOrientationPortraitUp": "竖屏",
+  "screenOrientationPortraitDown": "竖屏（倒置）",
+  "screenOrientationLandscapeLeft": "横屏（左）",
+  "screenOrientationLandscapeRight": "横屏（右）"
+}

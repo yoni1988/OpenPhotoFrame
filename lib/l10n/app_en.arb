@@ -251,6 +251,9 @@
     }
   },
   
+  "configRecoveredFromBackup": "The config was corrupted. The backup was loaded. The app started with the last saved version.",
+  "configResetToDefaults": "The config was corrupted. No readable backup was found. The app started unconfigured.",
+  
   "noPhotosFound": "No photos found",
   "tapCenterToOpenSettings": "Tap center of screen to open settings",
   

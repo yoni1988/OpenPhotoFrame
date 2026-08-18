@@ -168,6 +168,7 @@ class OpenPhotoFrameApp extends StatelessWidget {
         supportedLocales: const [
           Locale('en'),
           Locale('de'),
+          Locale('zh'),
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData(

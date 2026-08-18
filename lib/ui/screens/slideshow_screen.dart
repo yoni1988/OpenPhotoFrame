@@ -124,19 +124,15 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
   }
 
   String? _buildStartupConfigNoticeMessage() {
-    final isGerman = Localizations.localeOf(context).languageCode == 'de';
+    final l10n = AppLocalizations.of(context)!;
 
     switch (widget.initialConfigLoadResult.state) {
       case ConfigLoadState.clean:
         return null;
       case ConfigLoadState.recoveredFromBackup:
-        return isGerman
-            ? 'Konfiguration war defekt. Das Backup wurde gelesen. Die Anwendung startet mit der letzten gespeicherten Version.'
-            : 'The config was corrupted. The backup was loaded. The app started with the last saved version.';
+        return l10n.configRecoveredFromBackup;
       case ConfigLoadState.resetToDefaults:
-        return isGerman
-            ? 'Konfiguration war defekt. Kein lesbares Backup gefunden. Die Anwendung startet unkonfiguriert.'
-            : 'The config was corrupted. No readable backup was found. The app started unconfigured.';
+        return l10n.configResetToDefaults;
     }
   }
   
