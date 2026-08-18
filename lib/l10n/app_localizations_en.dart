@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -31,6 +32,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unitSeconds => 'sec';
+
+  @override
+  String get unitMilliseconds => 'ms';
+
+  @override
+  String get transitionEffect => 'Transition Effect';
+
+  @override
+  String get transitionEffectRandom => 'Random';
+
+  @override
+  String get transitionEffectFade => 'Fade';
+
+  @override
+  String get transitionEffectSlideRight => 'Slide from right';
+
+  @override
+  String get transitionEffectSlideLeft => 'Slide from left';
+
+  @override
+  String get transitionEffectSlideUp => 'Slide up';
+
+  @override
+  String get transitionEffectSlideDown => 'Slide down';
+
+  @override
+  String get transitionEffectZoomIn => 'Zoom in';
+
+  @override
+  String get transitionEffectZoomOut => 'Zoom out';
+
+  @override
+  String get transitionEffectRotate => 'Rotate';
+
+  @override
+  String get transitionEffectFlip => '3D flip';
+
+  @override
+  String get transitionEffectBlur => 'Blur';
 
   @override
   String get sectionClock => 'Clock';

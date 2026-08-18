@@ -289,6 +289,32 @@ class PhotoService extends ChangeNotifier {
     return photo;
   }
 
+  /// Returns the photo that [nextPhoto] will hand out next, without consuming
+  /// it. Used to preload/decode the upcoming image while the current one is
+  /// still on screen, which is what makes very short slide durations smooth.
+  PhotoEntry? peekNextPhoto() {
+    // Already known (e.g. after navigating backwards through the history)
+    if (_historyIndex < _history.length - 1) {
+      return _history[_historyIndex + 1];
+    }
+
+    final photos = _repository.photos;
+    final photo = _playlistStrategy.nextPhoto(photos);
+
+    if (photo != null) {
+      photo.lastShown = DateTime.now();
+      // Append without advancing the cursor - nextPhoto() picks it up from
+      // the history on its next call.
+      _history.add(photo);
+
+      if (_history.length > 50) {
+        _history.removeAt(0);
+        _historyIndex--;
+      }
+    }
+    return photo;
+  }
+
   PhotoEntry? previousPhoto() {
     if (_historyIndex > 0) {
       _historyIndex--;

@@ -16,6 +16,7 @@ import '../../infrastructure/services/geocoding_service.dart';
 import '../../infrastructure/services/keep_alive_service.dart';
 import '../../domain/models/photo_entry.dart';
 import '../widgets/photo_slide.dart';
+import '../widgets/slide_transitions.dart';
 import '../widgets/clock_overlay.dart';
 import '../widgets/photo_info_overlay.dart';
 import '../../infrastructure/services/json_config_service.dart';
@@ -405,19 +406,26 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
 
   void _startTimer() {
     _timer?.cancel();
+    if (!mounted) return;
     final config = context.read<ConfigProvider>();
     final slideDuration = Duration(seconds: config.slideDurationSeconds);
-    _timer = Timer.periodic(slideDuration, (timer) {
-      _nextSlide();
+    // One-shot timer that reschedules itself only after the next slide is
+    // actually on screen. With a periodic timer and short slide durations
+    // (1-2s) the ticks could outrun image decoding and pile up.
+    _timer = Timer(slideDuration, () async {
+      await _nextSlide();
+      if (mounted && !_isPaused) {
+        _startTimer();
+      }
     });
   }
 
-  void _nextSlide() {
+  Future<void> _nextSlide() async {
     final service = context.read<PhotoService>();
     final photo = service.nextPhoto();
     
     if (photo != null && photo.file.path != _currentPhoto?.file.path) {
-      _transitionTo(photo);
+      await _transitionTo(photo);
     }
   }
 
@@ -428,8 +436,9 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
     final photo = forward ? service.nextPhoto() : service.previousPhoto();
     
     if (photo != null) {
-      // Slide direction: next = slide from right, previous = slide from left
-      _transitionTo(photo, slideDirection: forward ? SlideDirection.right : SlideDirection.left);
+      // Slide direction: next = slide in from the right, previous = from the left
+      _transitionTo(photo,
+          effectOverride: forward ? TransitionEffect.slideRight : TransitionEffect.slideLeft);
     }
     
     // Restart timer after interaction
@@ -454,7 +463,7 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
     });
   }
 
-  Future<void> _transitionTo(PhotoEntry photo, {SlideDirection? slideDirection}) async {
+  Future<void> _transitionTo(PhotoEntry photo, {TransitionEffect? effectOverride}) async {
     // Increment transaction ID - this invalidates any pending transitions
     final myTransitionId = ++_transitionId;
     
@@ -489,12 +498,14 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
       slide.controller.value = 1.0;
     }
 
-    // Create controller for new slide
-    // Slide animation is faster (300ms) than fade (configurable)
+    // Create controller for new slide.
+    // Manual navigation always uses a snappy 300ms slide so tapping feels
+    // instant; auto-advance uses the configured effect and duration.
     final config = context.read<ConfigProvider>();
-    final duration = slideDirection != null
+    final effect = (effectOverride ?? TransitionEffect.fromId(config.transitionEffect)).resolve();
+    final duration = effectOverride != null
         ? const Duration(milliseconds: 300)
-        : Duration(milliseconds: config.transitionDurationMs);
+        : _effectiveTransitionDuration(config);
     
     final controller = AnimationController(
       vsync: this,
@@ -504,7 +515,7 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
     final newItem = _SlideItem(
       photo: photo,
       controller: controller,
-      slideDirection: slideDirection,
+      effect: effect,
     );
 
     // Log EXIF metadata when displaying a photo
@@ -527,6 +538,31 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
           }
         });
       }
+    });
+
+    // Decode the upcoming photo while this one is being shown, so the next
+    // transition can start immediately even at 1s slide duration.
+    _prefetchNextPhoto();
+  }
+
+  /// The transition never takes longer than the slide itself, otherwise short
+  /// slide durations would show nothing but cross-fades.
+  Duration _effectiveTransitionDuration(ConfigProvider config) {
+    final slideMs = config.slideDurationSeconds * 1000;
+    final maxMs = (slideMs * 0.8).round();
+    final ms = config.transitionDurationMs.clamp(50, maxMs < 50 ? 50 : maxMs);
+    return Duration(milliseconds: ms);
+  }
+
+  /// Warms the image cache with the photo that will be shown next.
+  void _prefetchNextPhoto() {
+    if (!mounted || _screenSize == null) return;
+    final next = context.read<PhotoService>().peekNextPhoto();
+    if (next == null || next.file.path == _currentPhoto?.file.path) return;
+
+    final provider = PhotoSlide.createOptimizedProvider(next.file, _screenSize!);
+    _preloadImage(provider).catchError((Object e) {
+      _log.fine('Prefetch failed for ${next.file.path}: $e');
     });
   }
 
@@ -698,30 +734,11 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
               blurBorders: config.blurBorders,
             );
             
-            // Use slide animation for manual navigation, fade for auto-advance
-            if (slide.slideDirection != null) {
-              // Slide from right (next) or left (previous)
-              final beginOffset = slide.slideDirection == SlideDirection.right
-                  ? const Offset(1.0, 0.0)  // Start from right
-                  : const Offset(-1.0, 0.0); // Start from left
-              
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: beginOffset,
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: slide.controller,
-                  curve: Curves.easeOutCubic,
-                )),
-                child: child,
-              );
-            } else {
-              // Fade transition for auto-advance
-              return FadeTransition(
-                opacity: slide.controller,
-                child: child,
-              );
-            }
+            return buildSlideTransition(
+              effect: slide.effect,
+              animation: slide.controller,
+              child: child,
+            );
           }).toList(),
 
           // 2. Clock Overlay
@@ -819,10 +836,7 @@ class _SlideshowScreenState extends State<SlideshowScreen> with TickerProviderSt
 class _SlideItem {
   final PhotoEntry photo;
   final AnimationController controller;
-  final SlideDirection? slideDirection; // null = fade, left/right = slide
+  final TransitionEffect effect; // already resolved (never TransitionEffect.random)
 
-  _SlideItem({required this.photo, required this.controller, this.slideDirection});
+  _SlideItem({required this.photo, required this.controller, required this.effect});
 }
-
-/// Direction for slide animation
-enum SlideDirection { left, right }

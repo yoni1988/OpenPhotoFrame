@@ -20,6 +20,7 @@ import '../../infrastructure/services/webdav_sync_service.dart';
 import '../../infrastructure/services/autostart_service.dart';
 import '../../infrastructure/services/native_screen_control_service.dart';
 import '../../infrastructure/services/keep_alive_service.dart';
+import '../widgets/slide_transitions.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 const PermissionRequestOption _devicePhotoPermissionRequest =
@@ -29,6 +30,34 @@ const PermissionRequestOption _devicePhotoPermissionRequest =
         mediaLocation: false,
       ),
     );
+
+/// Selectable slide durations, from "1 second" up to 15 minutes.
+/// Non-linear so both fast slideshows and slow photo frames are reachable
+/// with a single slider.
+const List<int> _slideDurationPresetsSeconds = [
+  1, 2, 3, 5, 8, 10, 15, 20, 30, 45,
+  60, 90, 120, 180, 300, 600, 900,
+];
+
+/// Selectable transition durations in milliseconds. Starts at 100ms so a
+/// 1-second slideshow still gets a visible but non-dominant animation.
+const List<int> _transitionDurationPresetsMs = [
+  100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000,
+];
+
+/// Index of the preset closest to [value].
+int _closestPresetIndex(List<int> presets, int value) {
+  var bestIndex = 0;
+  var bestDelta = (presets[0] - value).abs();
+  for (var i = 1; i < presets.length; i++) {
+    final delta = (presets[i] - value).abs();
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      bestIndex = i;
+    }
+  }
+  return bestIndex;
+}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -43,8 +72,9 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     minute: 0,
   );
 
-  late int _slideDurationMinutes;
-  late double _transitionDurationSeconds;
+  late int _slideDurationIndex;
+  late int _transitionDurationIndex;
+  late String _transitionEffect;
   late bool _blurBorders;
   late String _syncType;
   late TextEditingController _nextcloudUrlController;
@@ -126,8 +156,11 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     
     final config = context.read<ConfigProvider>();
-    _slideDurationMinutes = (config.slideDurationSeconds / 60).round().clamp(1, 15);
-    _transitionDurationSeconds = (config.transitionDurationMs / 1000.0).clamp(0.5, 5.0);
+    _slideDurationIndex =
+        _closestPresetIndex(_slideDurationPresetsSeconds, config.slideDurationSeconds);
+    _transitionDurationIndex =
+        _closestPresetIndex(_transitionDurationPresetsMs, config.transitionDurationMs);
+    _transitionEffect = TransitionEffect.fromId(config.transitionEffect).id;
     _blurBorders = config.blurBorders;
     // Default sync type: app_folder on Android, local_folder on Desktop
     final defaultSyncType = Platform.isAndroid ? 'app_folder' : 'local_folder';
@@ -314,8 +347,9 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
         _syncType == 'nextcloud_link' && 
         newNextcloudUrl.isNotEmpty;
     
-    config.slideDurationSeconds = _slideDurationMinutes * 60;
-    config.transitionDurationMs = (_transitionDurationSeconds * 1000).round();
+    config.slideDurationSeconds = _slideDurationPresetsSeconds[_slideDurationIndex];
+    config.transitionDurationMs = _transitionDurationPresetsMs[_transitionDurationIndex];
+    config.transitionEffect = _transitionEffect;
     config.blurBorders = _blurBorders;
     // app_folder and local_folder both use empty activeSourceType (no sync)
     final isLocalMode = _syncType == 'local_folder' || _syncType == 'app_folder';
@@ -401,36 +435,36 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           _buildSectionHeader(AppLocalizations.of(context)!.sectionSlideshow),
           const SizedBox(height: 8),
           
-          // Slide Duration
-          _buildSliderSetting(
+          // Slide Duration (1 second up to 15 minutes)
+          _buildPresetSliderSetting(
             icon: Icons.timer,
             title: AppLocalizations.of(context)!.slideDuration,
-            value: _slideDurationMinutes.toDouble(),
-            min: 1,
-            max: 15,
-            divisions: 14,
-            unit: AppLocalizations.of(context)!.unitMinutes,
+            index: _slideDurationIndex,
+            count: _slideDurationPresetsSeconds.length,
+            label: _formatSlideDuration(_slideDurationPresetsSeconds[_slideDurationIndex]),
             onChanged: (value) {
-              setState(() => _slideDurationMinutes = value.round());
+              setState(() => _slideDurationIndex = value);
             },
           ),
           
           const SizedBox(height: 16),
           
-          // Transition Duration (0.5 - 5 seconds, 0.5s steps)
-          _buildSliderSetting(
+          // Transition Duration (0.1 - 5 seconds)
+          _buildPresetSliderSetting(
             icon: Icons.blur_on,
             title: AppLocalizations.of(context)!.transitionDuration,
-            value: _transitionDurationSeconds,
-            min: 0.5,
-            max: 5.0,
-            divisions: 9,  // 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0
-            unit: AppLocalizations.of(context)!.unitSeconds,
-            formatValue: (v) => v.toStringAsFixed(1),
+            index: _transitionDurationIndex,
+            count: _transitionDurationPresetsMs.length,
+            label: _formatTransitionDuration(_transitionDurationPresetsMs[_transitionDurationIndex]),
             onChanged: (value) {
-              setState(() => _transitionDurationSeconds = value);
+              setState(() => _transitionDurationIndex = value);
             },
           ),
+
+          const SizedBox(height: 16),
+
+          // Transition Effect
+          _buildTransitionEffectSelector(),
 
           const SizedBox(height: 16),
 
@@ -756,6 +790,112 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     );
   }
   
+  /// Slider over a fixed list of presets; [index] selects the entry and
+  /// [label] is the already formatted value shown on the right.
+  Widget _buildPresetSliderSetting({
+    required IconData icon,
+    required String title,
+    required int index,
+    required int count,
+    required String label,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(title)),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Slider(
+          value: index.toDouble(),
+          min: 0,
+          max: (count - 1).toDouble(),
+          divisions: count - 1,
+          onChanged: (value) => onChanged(value.round()),
+        ),
+      ],
+    );
+  }
+
+  String _formatSlideDuration(int seconds) {
+    final l10n = AppLocalizations.of(context)!;
+    if (seconds < 60) return '$seconds ${l10n.unitSeconds}';
+    final minutes = seconds / 60;
+    final text = minutes == minutes.roundToDouble()
+        ? minutes.round().toString()
+        : minutes.toStringAsFixed(1);
+    return '$text ${l10n.unitMinutes}';
+  }
+
+  String _formatTransitionDuration(int ms) {
+    final l10n = AppLocalizations.of(context)!;
+    if (ms < 1000) return '$ms ${l10n.unitMilliseconds}';
+    return '${(ms / 1000).toStringAsFixed(ms % 1000 == 0 ? 0 : 1)} ${l10n.unitSeconds}';
+  }
+
+  String _transitionEffectLabel(TransitionEffect effect) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (effect) {
+      case TransitionEffect.fade:
+        return l10n.transitionEffectFade;
+      case TransitionEffect.slideRight:
+        return l10n.transitionEffectSlideRight;
+      case TransitionEffect.slideLeft:
+        return l10n.transitionEffectSlideLeft;
+      case TransitionEffect.slideUp:
+        return l10n.transitionEffectSlideUp;
+      case TransitionEffect.slideDown:
+        return l10n.transitionEffectSlideDown;
+      case TransitionEffect.zoomIn:
+        return l10n.transitionEffectZoomIn;
+      case TransitionEffect.zoomOut:
+        return l10n.transitionEffectZoomOut;
+      case TransitionEffect.rotate:
+        return l10n.transitionEffectRotate;
+      case TransitionEffect.flip:
+        return l10n.transitionEffectFlip;
+      case TransitionEffect.blur:
+        return l10n.transitionEffectBlur;
+      case TransitionEffect.random:
+        return l10n.transitionEffectRandom;
+    }
+  }
+
+  Widget _buildTransitionEffectSelector() {
+    return Row(
+      children: [
+        const Icon(Icons.animation, size: 20),
+        const SizedBox(width: 12),
+        Expanded(child: Text(AppLocalizations.of(context)!.transitionEffect)),
+        DropdownButton<String>(
+          value: _transitionEffect,
+          items: [
+            // "Random" first so it is easy to find, then the concrete effects.
+            for (final effect in [TransitionEffect.random, ...TransitionEffect.concrete])
+              DropdownMenuItem(
+                value: effect.id,
+                child: Text(_transitionEffectLabel(effect)),
+              ),
+          ],
+          onChanged: (value) {
+            if (value == null) return;
+            setState(() => _transitionEffect = value);
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildSliderSetting({
     required IconData icon,
     required String title,

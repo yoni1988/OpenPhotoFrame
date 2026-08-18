@@ -261,6 +261,14 @@ class JsonConfigService extends ConfigProvider {
   }
 
   @override
+  String get transitionEffect => _config['transition_effect'] ?? 'fade';
+
+  @override
+  set transitionEffect(String value) {
+    _config['transition_effect'] = value;
+  }
+
+  @override
   bool get blurBorders => _config['blur_borders'] ?? true;
 
   @override

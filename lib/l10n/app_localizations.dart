@@ -146,6 +146,84 @@ abstract class AppLocalizations {
   /// **'sec'**
   String get unitSeconds;
 
+  /// No description provided for @unitMilliseconds.
+  ///
+  /// In en, this message translates to:
+  /// **'ms'**
+  String get unitMilliseconds;
+
+  /// No description provided for @transitionEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Transition Effect'**
+  String get transitionEffect;
+
+  /// No description provided for @transitionEffectRandom.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get transitionEffectRandom;
+
+  /// No description provided for @transitionEffectFade.
+  ///
+  /// In en, this message translates to:
+  /// **'Fade'**
+  String get transitionEffectFade;
+
+  /// No description provided for @transitionEffectSlideRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide from right'**
+  String get transitionEffectSlideRight;
+
+  /// No description provided for @transitionEffectSlideLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide from left'**
+  String get transitionEffectSlideLeft;
+
+  /// No description provided for @transitionEffectSlideUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide up'**
+  String get transitionEffectSlideUp;
+
+  /// No description provided for @transitionEffectSlideDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide down'**
+  String get transitionEffectSlideDown;
+
+  /// No description provided for @transitionEffectZoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in'**
+  String get transitionEffectZoomIn;
+
+  /// No description provided for @transitionEffectZoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out'**
+  String get transitionEffectZoomOut;
+
+  /// No description provided for @transitionEffectRotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get transitionEffectRotate;
+
+  /// No description provided for @transitionEffectFlip.
+  ///
+  /// In en, this message translates to:
+  /// **'3D flip'**
+  String get transitionEffectFlip;
+
+  /// No description provided for @transitionEffectBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get transitionEffectBlur;
+
   /// No description provided for @sectionClock.
   ///
   /// In en, this message translates to:
