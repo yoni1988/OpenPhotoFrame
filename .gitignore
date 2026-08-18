@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# CocoaPods files generated locally on macOS. The project only builds for
+# Android (CI) and Linux (development), so these are never part of a build.
+/ios/Podfile
+/macos/Podfile
