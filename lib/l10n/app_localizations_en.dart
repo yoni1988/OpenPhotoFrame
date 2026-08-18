@@ -139,6 +139,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localFolderSubtitle => 'Use photos from a local folder';
 
   @override
+  String get localFolderSubtitleAndroid =>
+      'Play photos from any folder on the device';
+
+  @override
+  String get allFilesAccessExplanation =>
+      'Reading photos from a folder outside the app requires the \"All files access\" permission. Android asks for it in the system settings.';
+
+  @override
+  String get grantAllFilesAccess => 'Grant folder access';
+
+  @override
   String get nextcloud => 'Nextcloud';
 
   @override

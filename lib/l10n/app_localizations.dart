@@ -352,6 +352,24 @@ abstract class AppLocalizations {
   /// **'Use photos from a local folder'**
   String get localFolderSubtitle;
 
+  /// No description provided for @localFolderSubtitleAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Play photos from any folder on the device'**
+  String get localFolderSubtitleAndroid;
+
+  /// No description provided for @allFilesAccessExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading photos from a folder outside the app requires the \"All files access\" permission. Android asks for it in the system settings.'**
+  String get allFilesAccessExplanation;
+
+  /// No description provided for @grantAllFilesAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant folder access'**
+  String get grantAllFilesAccess;
+
   /// No description provided for @nextcloud.
   ///
   /// In en, this message translates to:

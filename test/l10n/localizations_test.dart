@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:open_photo_frame/l10n/app_localizations.dart';
@@ -5,7 +8,35 @@ import 'package:open_photo_frame/l10n/app_localizations.dart';
 /// Locales the app ships. Keep in sync with `supportedLocales` in main.dart.
 const _expectedLocales = ['en', 'de', 'zh'];
 
+/// Reads an .arb file and returns only the translatable keys (skipping the
+/// `@`-prefixed metadata and the `@@locale` header).
+Set<String> _translationKeys(String locale) {
+  final file = File('lib/l10n/app_$locale.arb');
+  expect(file.existsSync(), isTrue, reason: '${file.path} is missing');
+  final decoded = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+  return decoded.keys.where((k) => !k.startsWith('@')).toSet();
+}
+
 void main() {
+  test('every locale translates exactly the same keys as English', () {
+    final english = _translationKeys('en');
+    expect(english, isNotEmpty);
+
+    for (final code in _expectedLocales.where((c) => c != 'en')) {
+      final keys = _translationKeys(code);
+      expect(
+        english.difference(keys),
+        isEmpty,
+        reason: 'app_$code.arb is missing translations',
+      );
+      expect(
+        keys.difference(english),
+        isEmpty,
+        reason: 'app_$code.arb has keys that no longer exist in English',
+      );
+    }
+  });
+
   test('every expected locale is supported by the delegate', () {
     final supported = AppLocalizations.supportedLocales
         .map((l) => l.languageCode)

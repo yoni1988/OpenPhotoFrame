@@ -135,6 +135,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localFolderSubtitle => '使用本地文件夹中的照片';
 
   @override
+  String get localFolderSubtitleAndroid => '播放设备上任意文件夹中的照片';
+
+  @override
+  String get allFilesAccessExplanation =>
+      '读取应用之外的文件夹需要「所有文件访问」权限，Android 会在系统设置中向你申请。';
+
+  @override
+  String get grantAllFilesAccess => '授予文件夹访问权限';
+
+  @override
   String get nextcloud => 'Nextcloud';
 
   @override

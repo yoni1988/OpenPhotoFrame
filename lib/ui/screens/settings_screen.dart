@@ -130,6 +130,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   // Local folder path
   late String _localFolderPath;
   String _defaultFolderPath = '';
+  /// Android: whether we may read files outside our own app folder.
+  bool _hasFolderAccess = !Platform.isAndroid;
   String _appVersion = '';
   
   // Device photos album selection (Android only)
@@ -272,6 +274,11 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       });
     }
     
+    // Android needs an explicit permission to read a user-picked folder
+    if (_syncType == 'local_folder') {
+      _refreshFolderAccess();
+    }
+
     // Load default folder path async
     _loadDefaultFolderPath();
     _loadAppVersion();
@@ -324,9 +331,13 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Re-check Device Admin status when app resumes (e.g., after granting permission)
+    // Re-check permissions when app resumes (e.g., after granting them in
+    // the system settings, which is the only way to grant All-files access)
     if (state == AppLifecycleState.resumed) {
       _checkDeviceAdmin();
+      if (_syncType == 'local_folder') {
+        _refreshFolderAccess();
+      }
     }
   }
   
@@ -968,6 +979,18 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           ),
           if (_syncType == 'device_photos')
             _buildDevicePhotosSelector(),
+          RadioListTile<String>(
+            title: Text(AppLocalizations.of(context)!.localFolder),
+            subtitle: Text(AppLocalizations.of(context)!.localFolderSubtitleAndroid),
+            value: 'local_folder',
+            groupValue: _syncType,
+            onChanged: (value) {
+              setState(() => _syncType = value!);
+              _refreshFolderAccess();
+            },
+          ),
+          if (_syncType == 'local_folder')
+            _buildLocalFolderSelector(),
         ] else ...[
           RadioListTile<String>(
             title: Text(AppLocalizations.of(context)!.localFolder),
@@ -1167,7 +1190,70 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   }
   
   /// Desktop only: Local folder with Change button
+  /// Android only: does the app currently have permission to read files
+  /// outside its own folder?
+  ///
+  /// Android 11+ requires "All files access" (MANAGE_EXTERNAL_STORAGE) to read
+  /// an arbitrary directory. Android 10 and below have no such permission, so
+  /// the legacy read permission is what counts there.
+  Future<bool> _checkFolderAccess() async {
+    if (!Platform.isAndroid) return true;
+    if (await Permission.manageExternalStorage.isGranted) return true;
+    return Permission.storage.isGranted;
+  }
+
+  Future<void> _refreshFolderAccess() async {
+    final granted = await _checkFolderAccess();
+    if (mounted && granted != _hasFolderAccess) {
+      setState(() => _hasFolderAccess = granted);
+    }
+  }
+
+  Future<void> _requestFolderAccess() async {
+    // On Android 11+ this opens the system settings page and returns straight
+    // away as "denied" - the real result arrives via didChangeAppLifecycleState
+    // when the user comes back. On Android 10 and below it is a normal dialog.
+    var status = await Permission.manageExternalStorage.request();
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+    }
+    if (!mounted) return;
+    setState(() => _hasFolderAccess = status.isGranted);
+    if (!status.isGranted && status.isPermanentlyDenied) {
+      await openAppSettings();
+    }
+  }
+
+  /// Shown instead of the folder picker until the permission is granted.
+  Widget _buildFolderAccessRequest() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.allFilesAccessExplanation,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          FilledButton.tonalIcon(
+            onPressed: _requestFolderAccess,
+            icon: const Icon(Icons.folder_special, size: 18),
+            label: Text(AppLocalizations.of(context)!.grantAllFilesAccess),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLocalFolderSelector() {
+    // Without the permission a picked path would just scan as empty
+    if (!_hasFolderAccess) {
+      return _buildFolderAccessRequest();
+    }
+
     // Show the actual path (either custom or default)
     final displayPath = _localFolderPath.isNotEmpty 
         ? _localFolderPath 
@@ -1224,7 +1310,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   Future<void> _pickFolder() async {
     try {
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Select Photo Folder',
+        dialogTitle: AppLocalizations.of(context)!.selectPhotoFolder,
       );
       
       if (selectedDirectory != null) {
